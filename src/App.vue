@@ -1,70 +1,107 @@
 <template>
-  <div class="container py-4">
-    <h2 class="mb-4">Employee Management System</h2>
-
-    <div class="card mb-4">
-      <div class="card-header">
-        {{ editMode ? 'Edit Employee' : 'Add Employee' }}
-      </div>
-      <div class="card-body">
-        <div class="row g-2">
-          <div class="col-md-6">
-            <label class="form-label">Name</label>
-            <input v-model="form.name" type="text" class="form-control" placeholder="Employee Name" />
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">Designation</label>
-            <input v-model="form.designation" type="text" class="form-control" placeholder="Designation" />
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">Department</label>
-            <input v-model="form.department" type="text" class="form-control" placeholder="Department" />
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">Salary</label>
-            <input v-model="form.salary" type="number" class="form-control" placeholder="Salary" />
-          </div>
-        </div>
-        <div class="mt-3">
-          <button class="btn btn-primary me-2" @click="submitForm">
-            {{ editMode ? 'Update' : 'Add Employee' }}
-          </button>
-          <button v-if="editMode" class="btn btn-secondary" @click="cancelEdit">Cancel</button>
-        </div>
-      </div>
+  <div class="container py-5">
+    <div class="text-center mb-5">
+      <h1 class="display-6 fw-bold">Employee Management System</h1>
+      <p class="text-secondary mb-0">A clean employee dashboard built with Vue and Bootstrap.</p>
     </div>
 
-   
-    <div class="card">
-      <div class="card-header">Employee Records</div>
-      <div class="card-body p-0">
-        <div v-if="loading" class="text-center p-3">Loading...</div>
-        <div v-else-if="employees.length === 0" class="text-center p-3 text-muted">No employees found.</div>
-        <table v-else class="table table-bordered table-hover mb-0">
-          <thead class="table-light">
-            <tr>
-              <th>#</th>
-              <th>Name</th>
-              <th>Designation</th>
-              <th>Department</th>
-              <th>Salary (₹)</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(emp, index) in employees" :key="emp.id">
-              <td>{{ index + 1 }}</td>
-              <td>{{ emp.name }}</td>
-              <td>{{ emp.designation }}</td>
-              <td>{{ emp.department }}</td>
-              <td>{{ emp.salary }}</td>
-              <td>
-                <button class="btn btn-sm btn-warning me-1" @click="editEmployee(emp)">Edit</button>
-                <button class="btn btn-sm btn-danger" @click="deleteEmployee(emp.id)">Delete</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+    <div class="row g-4">
+      <div class="col-lg-4">
+        <div class="card shadow-sm border-0 h-100">
+          <div class="card-body">
+            <h5 class="card-title mb-3">{{ editMode ? 'Edit Employee' : 'Add Employee' }}</h5>
+            <div class="row g-3">
+              <div class="col-12">
+                <label class="form-label">Name</label>
+                <input v-model="form.name" type="text" class="form-control" placeholder="Employee name" />
+              </div>
+              <div class="col-12">
+                <label class="form-label">Designation</label>
+                <input v-model="form.designation" type="text" class="form-control" placeholder="Designation" />
+              </div>
+              <div class="col-12">
+                <label class="form-label">Department</label>
+                <input v-model="form.department" type="text" class="form-control" placeholder="Department" />
+              </div>
+              <div class="col-12">
+                <label class="form-label">Salary</label>
+                <input v-model="form.salary" type="number" class="form-control" placeholder="Salary" />
+              </div>
+            </div>
+
+            <div class="mt-4 d-flex flex-wrap gap-2">
+              <button class="btn btn-primary" @click="submitForm">
+                {{ editMode ? 'Update Employee' : 'Add Employee' }}
+              </button>
+              <button v-if="editMode" class="btn btn-outline-secondary" @click="cancelEdit">Cancel</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-3 mt-3">
+          <div class="col-sm-6">
+            <div class="card bg-light border-0 shadow-sm p-3 text-center">
+              <div class="text-muted small">Total employees</div>
+              <div class="h2 mb-0">{{ totalEmployees }}</div>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="card bg-light border-0 shadow-sm p-3 text-center">
+              <div class="text-muted small">Average salary</div>
+              <div class="h2 mb-0">₹ {{ averageSalary }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-8">
+        <div class="card shadow-sm border-0 h-100">
+          <div class="card-body">
+            <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between mb-4 gap-2">
+              <div>
+                <h5 class="card-title mb-1">Employee Records</h5>
+                <p class="text-muted mb-0">Manage all employee entries from one easy dashboard.</p>
+              </div>
+              <span class="badge bg-primary fs-6">{{ totalEmployees }} records</span>
+            </div>
+
+            <div class="table-responsive">
+              <div v-if="loading" class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+              </div>
+              <div v-else-if="employees.length === 0" class="alert alert-info mb-0">
+                No employees found. Add a new employee to get started.
+              </div>
+              <table v-else class="table table-hover align-middle mb-0">
+                <thead class="table-primary">
+                  <tr>
+                    <th class="text-secondary">#</th>
+                    <th class="text-secondary">Name</th>
+                    <th class="text-secondary">Designation</th>
+                    <th class="text-secondary">Department</th>
+                    <th class="text-secondary">Salary (₹)</th>
+                    <th class="text-secondary">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(emp, index) in employees" :key="emp.id">
+                    <td>{{ index + 1 }}</td>
+                    <td>{{ emp.name }}</td>
+                    <td>{{ emp.designation }}</td>
+                    <td>{{ emp.department }}</td>
+                    <td>₹ {{ emp.salary }}</td>
+                    <td>
+                      <button class="btn btn-sm btn-outline-warning me-1" @click="editEmployee(emp)">Edit</button>
+                      <button class="btn btn-sm btn-outline-danger" @click="deleteEmployee(emp.id)">Delete</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -73,7 +110,7 @@
 <script>
 import axios from 'axios'
 
-const API_URL = 'https://69fa0338c509a40d3aa3bb6a.mockapi.io/api/employees' 
+const API_URL = 'https://69fa0338c509a40d3aa3bb6a.mockapi.io/api/employees'
 
 export default {
   name: 'App',
@@ -89,6 +126,16 @@ export default {
         department: '',
         salary: ''
       }
+    }
+  },
+  computed: {
+    totalEmployees() {
+      return this.employees.length
+    },
+    averageSalary() {
+      if (!this.employees.length) return 0
+      const total = this.employees.reduce((sum, emp) => sum + Number(emp.salary), 0)
+      return Math.round(total / this.employees.length)
     }
   },
   mounted() {
