@@ -1,8 +1,7 @@
 <template>
-  <div class="container py-5">
+  <div class="container py-5" style="background-color: #f5f0e8; min-height: 100vh;">
     <div class="text-center mb-5">
       <h1 class="display-6 fw-bold">Employee Management System</h1>
-      <p class="text-secondary mb-0">A clean employee dashboard built with Vue and Bootstrap.</p>
     </div>
 
     <div class="row g-4">
